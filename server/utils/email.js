@@ -9,22 +9,26 @@ dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // TLS
+  secure: false,
   requireTLS: true,
-  family: 4, // Force IPv4
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
+  tls: {
+    family: 4,
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 60000,
+  greetingTimeout: 60000,
+  socketTimeout: 60000,
 });
 
 // Verify transporter
-transporter.verify((error, success) => {
+transporter.verify((error) => {
   if (error) {
-    console.error("❌ Email Configuration Error:");
+    console.error("EMAIL_USER:", process.env.EMAIL_USER);
+    console.error("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
     console.error(error);
   } else {
     console.log("✅ Email Server Ready");
