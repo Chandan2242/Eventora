@@ -25,13 +25,23 @@ exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+
     const userExists = await User.findOne({ email });
 
-    if (userExists) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
-    }
+if (userExists) {
+  if (userExists.isVerified) {
+    return res.status(400).json({
+      message: "User already exists",
+    });
+  }
+
+  // Purana unverified user delete karo
+  await User.deleteOne({ email });
+  await OTP.deleteMany({
+    email,
+    action: "account_verification",
+  });
+}
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -54,13 +64,27 @@ exports.registerUser = async (req, res) => {
       action: "account_verification",
     });
 
-    await sendOtpEmail(email, otp, "account_verification");
+  try {
+  await sendOtpEmail(email, otp, "account_verification");
+} catch (error) {
 
-    res.status(202).json({
-      message:
-        "User registered successfully. Please check your email for OTP verification.",
-      email: user.email,
-    });
+  await User.deleteOne({ email });
+
+  await OTP.deleteMany({
+    email,
+    action: "account_verification",
+  });
+
+  return res.status(500).json({
+    message: "OTP email could not be sent. Please try again.",
+  });
+}
+
+return res.status(202).json({
+  message:
+    "User registered successfully. Please check your email for OTP verification.",
+  email: user.email,
+});
   } catch (err) {
     res.status(500).json({
       error: err.message,
