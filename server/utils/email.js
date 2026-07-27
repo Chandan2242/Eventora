@@ -7,11 +7,18 @@ dotenv.config();
 // Email Transporter
 // ======================
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // TLS
+  requireTLS: true,
+  family: 4, // Force IPv4
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 
 // Verify transporter
@@ -29,7 +36,7 @@ transporter.verify((error, success) => {
 // ======================
 const sendBookingEmail = async (userEmail, userName, eventTitle) => {
   try {
-    const mailOptions = {
+    await transporter.sendMail({
       from: `"Eventora" <${process.env.EMAIL_USER}>`,
       to: userEmail,
       subject: `Booking Confirmed - ${eventTitle}`,
@@ -38,13 +45,11 @@ const sendBookingEmail = async (userEmail, userName, eventTitle) => {
         <p>Your booking for <b>${eventTitle}</b> has been confirmed successfully.</p>
         <p>Thank you for choosing <b>Eventora</b>.</p>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-    console.log("✅ Booking email sent to:", userEmail);
+    console.log("✅ Booking email sent:", userEmail);
   } catch (error) {
-    console.error("❌ Booking Email Error:");
+    console.error("❌ Booking Email Error");
     console.error(error);
     throw error;
   }
@@ -63,15 +68,16 @@ const sendOtpEmail = async (userEmail, otp, type) => {
     const message =
       type === "account_verification"
         ? "Use the OTP below to verify your Eventora account."
-        : "Use the OTP below to confirm your event booking.";
+        : "Use the OTP below to confirm your booking.";
 
-    const mailOptions = {
+    await transporter.sendMail({
       from: `"Eventora" <${process.env.EMAIL_USER}>`,
       to: userEmail,
       subject,
       html: `
         <div style="font-family:Arial,sans-serif;padding:20px">
           <h2>Eventora OTP Verification</h2>
+
           <p>${message}</p>
 
           <h1 style="
@@ -79,8 +85,8 @@ const sendOtpEmail = async (userEmail, otp, type) => {
             color:#2563eb;
             background:#f3f4f6;
             padding:15px;
-            display:inline-block;
             border-radius:8px;
+            display:inline-block;
           ">
             ${otp}
           </h1>
@@ -90,15 +96,14 @@ const sendOtpEmail = async (userEmail, otp, type) => {
           <p>If you didn't request this OTP, please ignore this email.</p>
         </div>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-    console.log(`✅ OTP sent successfully to ${userEmail}`);
+    console.log("✅ OTP sent:", userEmail);
   } catch (error) {
-    console.error("❌ OTP Email Error:");
+    console.error("❌ OTP Email Error");
     console.error(error);
-
+    console.error("Code:", error.code);
+    console.error("Command:", error.command);
     throw error;
   }
 };
