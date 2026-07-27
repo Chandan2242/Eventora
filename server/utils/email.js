@@ -8,24 +8,28 @@ dotenv.config();
 // ======================
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 15000,
 });
 
 // Verify transporter
-transporter.verify((error) => {
-  if (error) {
-    console.error("EMAIL_USER:", process.env.EMAIL_USER);
-    console.error("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
-    console.error(error);
-  } else {
-    console.log("✅ Email Server Ready");
-  }
-});
+// transporter.verify((error) => {
+//   if (error) {
+//     console.error("EMAIL_USER:", process.env.EMAIL_USER);
+//     console.error("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+//     console.error(error);
+//   } else {
+//     console.log("✅ Email Server Ready");
+//   }
+// });
 
 // ======================
 // Booking Confirmation Email
