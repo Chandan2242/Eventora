@@ -56,7 +56,7 @@ if (userExists) {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    console.log(`OTP for ${email}: ${otp}`);
+    // console.log(`OTP for ${email}: ${otp}`);
 
     await OTP.create({
       email,
