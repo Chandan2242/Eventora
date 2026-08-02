@@ -7,7 +7,10 @@ require("dotenv").config();
 // ======================
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -25,15 +28,15 @@ console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 // Test Email Connection
 // ======================
 
-const verifyEmailServer = async () => {
-  try {
-    await transporter.verify();
-    console.log("✅ Email Server Ready");
-  } catch (error) {
-    console.log("❌ Email Server Error");
-    console.log(error);
-  }
-};
+// const verifyEmailServer = async () => {
+//   try {
+//     await transporter.verify();
+//     console.log("✅ Email Server Ready");
+//   } catch (error) {
+//     console.log("❌ Email Server Error");
+//     console.log(error);
+//   }
+// };
 
 
 // ======================
@@ -83,7 +86,7 @@ const sendBookingEmail = async (
     );
 
 
-  } catch(error){
+  } catch (error) {
 
     console.log(
       "❌ Booking Email Failed"
@@ -118,20 +121,20 @@ const sendOtpEmail = async (
     await transporter.sendMail({
 
       from:
-      `"Eventora" <${process.env.EMAIL_USER}>`,
+        `"Eventora" <${process.env.EMAIL_USER}>`,
 
 
-      to:userEmail,
+      to: userEmail,
 
 
       subject:
-      isVerification
-      ? "Verify Your Eventora Account"
-      : "Event Booking OTP",
+        isVerification
+          ? "Verify Your Eventora Account"
+          : "Event Booking OTP",
 
 
 
-      html:`
+      html: `
 
       <div style="
         font-family:Arial;
@@ -147,11 +150,10 @@ const sendOtpEmail = async (
 
 
       <p>
-      ${
-        isVerification
-        ? "Use this OTP to verify your account."
-        : "Use this OTP to confirm your booking."
-      }
+      ${isVerification
+          ? "Use this OTP to verify your account."
+          : "Use this OTP to confirm your booking."
+        }
       </p>
 
 
@@ -198,7 +200,7 @@ const sendOtpEmail = async (
 
 
 
-  } catch(error){
+  } catch (error) {
 
 
     console.log(
@@ -238,6 +240,6 @@ module.exports = {
 
   sendOtpEmail,
 
-  verifyEmailServer
+  // verifyEmailServer
 
 };

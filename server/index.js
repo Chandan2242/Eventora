@@ -68,7 +68,7 @@ mongoose
 
 
     // Check Email SMTP
-    await verifyEmailServer();
+    // await verifyEmailServer();
 
 
     const PORT = process.env.PORT || 5000;
