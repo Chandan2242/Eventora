@@ -18,6 +18,9 @@ const transporter = nodemailer.createTransport({
 });
 
 
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
+
 // ======================
 // Test Email Connection
 // ======================
@@ -28,7 +31,7 @@ const verifyEmailServer = async () => {
     console.log("✅ Email Server Ready");
   } catch (error) {
     console.log("❌ Email Server Error");
-    console.log(error.message);
+    console.log(error);
   }
 };
 
