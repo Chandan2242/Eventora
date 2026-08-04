@@ -14,7 +14,7 @@ const {
   getAllBookings,
 } = require("../controllers/bookingController");
 
-// console.log("Booking Routes Loaded");
+
 console.log("verifyBookingOTP =>", verifyBookingOTP);
 
 // ===================================
@@ -35,7 +35,7 @@ router.post(
   "/verify",
   protect,
   (req, res, next) => {
-    // console.log("VERIFY ROUTE HIT");
+
     next();
   },
   verifyBookingOTP

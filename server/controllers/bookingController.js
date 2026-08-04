@@ -8,7 +8,7 @@ const {
   sendBookingEmail,
 } = require("../utils/email");
 
-// console.log("Booking Controller Loaded");
+
 
 // ===============================
 // Generate OTP
@@ -141,13 +141,12 @@ message:"OTP Sent"
 // Verify OTP + Create Booking
 // ==============================
 const verifyBookingOTP = async (req, res) => {
-  // console.log("VERIFY BOOKING CONTROLLER STARTED");
-  // console.log("BODY =>", req.body);
-  try {
-    // console.log("===== VERIFY BOOKING OTP =====");
-    // console.log("BODY =>", req.body);
-    // console.log("USER =>", req.user);
 
+ 
+    
+
+  try {
+   
     const { eventId, otp, numberOfTickets = 1 } = req.body;
 
     if (!eventId) {
@@ -164,7 +163,6 @@ const verifyBookingOTP = async (req, res) => {
       action: "event_booking",
     });
 
-    // console.log("OTP RECORD =>", otpRecord);
 
     if (!otpRecord) {
       return res.status(400).json({
@@ -176,8 +174,8 @@ const verifyBookingOTP = async (req, res) => {
     // Find Event
     const event = await Event.findById(eventId);
 
-    // console.log("EVENT =>", event);
 
+ 
     if (!event) {
       return res.status(404).json({
         success: false,
