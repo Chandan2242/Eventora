@@ -7,17 +7,11 @@ require("dotenv").config();
 // ======================
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-
-  connectionTimeout: 15000,
-  socketTimeout: 15000,
 });
 
 
@@ -28,17 +22,17 @@ console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 // Test Email Connection
 // ======================
 
-// const verifyEmailServer = async () => {
-//   try {
-//     await transporter.verify();
-//     console.log("✅ Email Server Ready");
-//   } catch (error) {
-//     console.log("❌ Email Server Error");
-//     console.log(error);
-//   }
-// };
+const verifyEmailServer = async () => {
+  try {
+    await transporter.verify();
+    console.log("✅ Email Server Ready");
+  } catch (error) {
+    console.log("❌ Email Server Error");
+    console.log(error);
+  }
+};
 
-
+await verifyEmailServer();
 // ======================
 // Send Booking Confirmation Email
 // ======================
