@@ -32,7 +32,7 @@ const verifyEmailServer = async () => {
   }
 };
 
-await verifyEmailServer();
+
 // ======================
 // Send Booking Confirmation Email
 // ======================
