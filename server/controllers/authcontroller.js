@@ -66,7 +66,11 @@ if (userExists) {
     });
 
   try {
-  await sendOtpEmail(email, otp, "account_verification");
+  // await sendOtpEmail(email, otp, "account_verification");
+  return res.status(200).json({
+  message: "Register Success",
+  otp
+  });
 } catch (error) {
 
   await User.deleteOne({ email });
@@ -131,7 +135,7 @@ exports.loginUser = async (req, res) => {
         action: "account_verification",
       });
       console.log("Sending OTP...");
-      
+
       await sendOtpEmail(email, otp, "account_verification");
 
       return res.status(400).json({
