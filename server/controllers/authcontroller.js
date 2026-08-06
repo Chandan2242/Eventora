@@ -23,29 +23,36 @@ const generateToken = (id, role, email) => {
 
 exports.registerUser = async (req, res) => {
   try {
-     console.log("Register API Hit");
-    const { name, email, password } = req.body;
+    console.log("Register API Hit");
 
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
 
-if (userExists) {
-  if (userExists.isVerified) {
-    return res.status(400).json({
-      message: "User already exists",
-    });
-  }
+    if (userExists) {
+      if (userExists.isVerified) {
+        return res.status(400).json({
+          message: "User already exists",
+        });
+      }
 
-  // Purana unverified user delete karo
-  await User.deleteOne({ email });
-  await OTP.deleteMany({
-    email,
-    action: "account_verification",
-  });
-}
+      // Delete old unverified user
+      await User.deleteOne({ email });
+
+      await OTP.deleteMany({
+        email,
+        action: "account_verification",
+      });
+    }
+
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      salt
+    );
+
 
     const user = await User.create({
       name,
@@ -55,9 +62,14 @@ if (userExists) {
       isVerified: false,
     });
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // console.log(`OTP for ${email}: ${otp}`);
+    console.log("User Created");
+
+
+    const otp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
 
     await OTP.create({
       email,
@@ -65,35 +77,82 @@ if (userExists) {
       action: "account_verification",
     });
 
-  try {
-  // await sendOtpEmail(email, otp, "account_verification");
-  return res.status(200).json({
-  message: "Register Success",
-  otp
-  });
-} catch (error) {
 
-  await User.deleteOne({ email });
+    console.log("OTP Saved:", otp);
 
-  await OTP.deleteMany({
-    email,
-    action: "account_verification",
-  });
 
-  return res.status(500).json({
-    message: "OTP email could not be sent. Please try again.",
-  });
-}
 
-return res.status(202).json({
-  message:
-    "User registered successfully. Please check your email for OTP verification.",
-  email: user.email,
-});
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
+    // Send Email
+    try {
+
+      console.log("Sending OTP Email...");
+
+      await sendOtpEmail(
+        email,
+        otp,
+        "account_verification"
+      );
+
+
+      console.log("OTP Email Sent");
+
+
+    } catch (error) {
+
+
+      console.log(
+        "OTP Email Error:",
+        error.message
+      );
+
+
+      await User.deleteOne({
+        email
+      });
+
+
+      await OTP.deleteMany({
+        email,
+        action:"account_verification"
+      });
+
+
+      return res.status(500).json({
+
+        message:
+        "OTP email could not be sent",
+
+      });
+
+    }
+
+
+
+    return res.status(200).json({
+
+      message:
+      "Registration successful. OTP sent to email",
+
+      email:user.email
+
     });
+
+
+
+  } catch (err) {
+
+    console.log(
+      "Register Error:",
+      err.message
+    );
+
+
+    return res.status(500).json({
+
+      error:err.message
+
+    });
+
   }
 };
 
