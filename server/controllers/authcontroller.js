@@ -27,26 +27,33 @@ exports.registerUser = async (req, res) => {
 
     const { name, email, password } = req.body;
 
+
     const userExists = await User.findOne({ email });
 
+
     if (userExists) {
+
       if (userExists.isVerified) {
         return res.status(400).json({
           message: "User already exists",
         });
       }
 
-      // Delete old unverified user
+
       await User.deleteOne({ email });
+
 
       await OTP.deleteMany({
         email,
         action: "account_verification",
       });
+
     }
 
 
+
     const salt = await bcrypt.genSalt(10);
+
 
     const hashedPassword = await bcrypt.hash(
       password,
@@ -54,16 +61,25 @@ exports.registerUser = async (req, res) => {
     );
 
 
+
     const user = await User.create({
+
       name,
+
       email,
+
       password: hashedPassword,
+
       role: "user",
+
       isVerified: false,
+
     });
 
 
+
     console.log("User Created");
+
 
 
     const otp = Math.floor(
@@ -71,21 +87,29 @@ exports.registerUser = async (req, res) => {
     ).toString();
 
 
+
     await OTP.create({
+
       email,
+
       otp,
+
       action: "account_verification",
+
     });
+
 
 
     console.log("OTP Saved:", otp);
 
 
 
-    // Send Email
+    // Send OTP Email
     try {
 
+
       console.log("Sending OTP Email...");
+
 
       await sendOtpEmail(
         email,
@@ -106,60 +130,47 @@ exports.registerUser = async (req, res) => {
       );
 
 
+
       await User.deleteOne({
         email
       });
 
 
+
       await OTP.deleteMany({
+
         email,
+
         action:"account_verification"
+
       });
+
 
 
       return res.status(500).json({
 
-        message:
-        "OTP email could not be sent",
+        message:"OTP email could not be sent"
 
       });
+
 
     }
 
 
 
-  try {
+    return res.status(200).json({
 
-  console.log("Sending OTP Email...");
+      message:
+      "Registration successful. OTP sent to email",
 
-  await sendOtpEmail(
-    email,
-    otp,
-    "account_verification"
-  );
+      email:user.email
 
-  console.log("OTP Email Sent");
-
-} catch (error) {
-
-  console.log("OTP Email Failed");
-  console.log(error.message);
-
-  return res.status(500).json({
-    message:"OTP email failed"
-  });
-
-}
-
-
-return res.status(200).json({
-  message:"Registration successful. OTP sent to email",
-  email:user.email
-});
+    });
 
 
 
   } catch (err) {
+
 
     console.log(
       "Register Error:",
@@ -172,6 +183,7 @@ return res.status(200).json({
       error:err.message
 
     });
+
 
   }
 };
