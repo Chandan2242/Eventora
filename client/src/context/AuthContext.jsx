@@ -28,14 +28,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = async (name, email, password) => {
-        try {
-            const { data } = await api.post('/auth/register', { name, email, password });
-            return data; // Returns { message, email }
-        } catch (error) {
-            throw error.response?.data?.message || 'Registration failed';
-        }
-    };
+   const register = async (name, email, password) => {
+  try {
+    console.log("Calling Register API...");
+
+    const { data } = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+    });
+
+    console.log("Register Success:", data);
+    return data;
+  } catch (error) {
+    console.log("Register Error:", error);
+
+    throw (
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Registration failed"
+    );
+  }
+};
 
     const verifyOTP = async (email, otp) => {
         try {

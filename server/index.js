@@ -17,7 +17,6 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
-
 // =====================
 // Middleware
 // =====================
@@ -25,7 +24,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://eventora-7ooa7hi86-chandan-2790.vercel.app/"
+  "https://eventora-7ooa7hi86-chandan-2790.vercel.app",
+  "https://eventora-pink.vercel.app"
 ];
 
 app.use(
@@ -43,15 +43,16 @@ app.use(
 
 app.use(express.json());
 
-
 // =====================
 // Test Route
 // =====================
 
 app.get("/", (req, res) => {
-  res.status(200).send("Eventora Server is Running...");
+  res.status(200).json({
+    success: true,
+    message: "Eventora Server is Running...",
+  });
 });
-
 
 // =====================
 // API Routes
@@ -64,7 +65,6 @@ app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/user", dashboardRoutes);
 
-
 // =====================
 // MongoDB Connection
 // =====================
@@ -72,33 +72,17 @@ app.use("/api/user", dashboardRoutes);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(async () => {
-
     console.log("✅ MongoDB Connected Successfully");
 
-
-    // Check Email SMTP
     // await verifyEmailServer();
-
 
     const PORT = process.env.PORT || 5000;
 
-
     app.listen(PORT, () => {
-
-      console.log(
-        `🚀 Server running on port ${PORT}`
-      );
-
+      console.log(`🚀 Server running on port ${PORT}`);
     });
-
-
   })
   .catch((err) => {
-
-    console.error(
-      "❌ MongoDB Connection Failed"
-    );
-
+    console.error("❌ MongoDB Connection Failed");
     console.error(err);
-
   });

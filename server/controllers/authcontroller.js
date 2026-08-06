@@ -23,6 +23,7 @@ const generateToken = (id, role, email) => {
 
 exports.registerUser = async (req, res) => {
   try {
+     console.log("Register API Hit");
     const { name, email, password } = req.body;
 
 
@@ -129,7 +130,8 @@ exports.loginUser = async (req, res) => {
         otp,
         action: "account_verification",
       });
-
+      console.log("Sending OTP...");
+      
       await sendOtpEmail(email, otp, "account_verification");
 
       return res.status(400).json({
