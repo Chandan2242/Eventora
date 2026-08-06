@@ -28,9 +28,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-   const register = async (name, email, password) => {
+ const register = async (name, email, password) => {
+  console.log("1. Register started");
+
   try {
-    console.log("Calling Register API...");
+    console.log("2. Sending request...");
 
     const { data } = await api.post("/auth/register", {
       name,
@@ -38,10 +40,11 @@ export const AuthProvider = ({ children }) => {
       password,
     });
 
-    console.log("Register Success:", data);
+    console.log("3. Response received:", data);
+
     return data;
   } catch (error) {
-    console.log("Register Error:", error);
+    console.log("4. Error:", error);
 
     throw (
       error.response?.data?.message ||
@@ -50,7 +53,6 @@ export const AuthProvider = ({ children }) => {
     );
   }
 };
-
     const verifyOTP = async (email, otp) => {
         try {
             const { data } = await api.post('/auth/verify-otp', { email, otp });
